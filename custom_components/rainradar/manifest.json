@@ -2,14 +2,14 @@
   "domain": "rainradar",
   "name": "Rain Radar",
   "version": "1.0.0",
-  "documentation": "https://github.com/yourusername/rainradar",
+  "documentation": "https://git.oakes.website/nic/rainradaha/-/tree/main",
   "requirements": [
     "requests",
     "pytz"
   ],
   "dependencies": [],
   "codeowners": [
-    "@yourusername"
+    "@nic oakes"
   ],
   "iot_class": "cloud_polling",
   "homeassistant": "2023.1.0"
