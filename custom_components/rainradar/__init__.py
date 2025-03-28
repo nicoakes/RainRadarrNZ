@@ -3,6 +3,7 @@
 from homeassistant import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers import discovery
+from homeassistant.config_entries import ConfigEntry
 
 DOMAIN = "rainradar"
 

@@ -1,5 +1,6 @@
 from homeassistant import config_entries
 from homeassistant.const import CONF_NAME
+from homeassistant.config_entries import ConfigEntry
 from .const import DOMAIN
 
 class RainRadarConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
