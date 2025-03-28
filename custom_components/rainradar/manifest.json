@@ -1,0 +1,16 @@
+{
+  "domain": "rainradar",
+  "name": "Rain Radar",
+  "version": "1.0.0",
+  "documentation": "https://github.com/yourusername/rainradar",
+  "requirements": [
+    "requests",
+    "pytz"
+  ],
+  "dependencies": [],
+  "codeowners": [
+    "@yourusername"
+  ],
+  "iot_class": "cloud_polling",
+  "homeassistant": "2023.1.0"
+}
