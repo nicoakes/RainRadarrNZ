@@ -13,10 +13,11 @@ To configure the RainRadar integration, follow these steps:
 
 1. Add the Integration to configuration.yaml
 
+```yaml
 rainradar:
   base_url: "https://www.metservice.com/publicData/rainRadar/image/Christchurch/300K/"
   image_dir: "images"
-
+```
 ## Usage
 Once configured, the RainRadar integration will create sensor entities that represent the latest rain radar images. You can add these sensors to your dashboard to view the images.
 
