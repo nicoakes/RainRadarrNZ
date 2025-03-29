@@ -1,6 +1,5 @@
 # File: /custom_components/rainradar/__init__.py
 
-from homeassistant import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers import discovery
 from homeassistant.config_entries import ConfigEntry
