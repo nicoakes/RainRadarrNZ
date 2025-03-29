@@ -2,7 +2,7 @@
   "domain": "rainradar",
   "name": "Rain Radar",
   "version": "1.0.0",
-  "documentation": "https://git.oakes.website/nic/rainradaha/-/tree/main",
+  "documentation": "https://github.com/nicoakes/RainRadarrNZ/tree/main",
   "requirements": [
     "requests",
     "pytz"
