@@ -5,6 +5,7 @@ import requests
 import pytz
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers import discovery
+from homeassistant.util.async_ import run_callback_threadsafe
 
 DOMAIN = "rainradar"
 IMAGE_DIR = "www/rainradar_images"
@@ -12,9 +13,14 @@ BASE_URL = "https://www.metservice.com/publicData/rainRadar/image/Christchurch/3
 TIMEZONE = "Pacific/Auckland"
 DOWNLOAD_INTERVAL = 8 * 60  # 8 minutes
 
+def get_timezone():
+    """Get the timezone object in a synchronous context."""
+    return pytz.timezone(TIMEZONE)
+
 async def download_images(hass: HomeAssistant):
     """Download radar images periodically."""
-    tz = pytz.timezone(TIMEZONE)
+    # Get the timezone in a thread-safe way
+    tz = await hass.async_add_executor_job(get_timezone)
     os.makedirs(hass.config.path(IMAGE_DIR), exist_ok=True)
 
     while True:
