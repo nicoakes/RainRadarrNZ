@@ -11,21 +11,11 @@ The RainRadar integration for Home Assistant allows users to fetch and display r
 ## Configuration
 To configure the RainRadar integration, follow these steps:
 
-1. Go to the Home Assistant UI.
-2. Navigate to **Configuration** > **Integrations**.
-3. Click on **Add Integration** and search for **RainRadar**.
-4. Follow the prompts to complete the setup.
+1. Add the Integration to configuration.yaml
 
-5. 2. Add the Integration to configuration.yaml
-If your integration does not support UI-based configuration, you can configure it manually in the configuration.yaml file. Based on the constants in your const.py, the configuration might look like this:
-
-base_url: The URL to fetch radar images.
-image_dir: The directory where radar images will be saved.
-
-### Configuration Options
-- **Base URL**: The URL from which to fetch the rain radar images. Default is `https://www.metservice.com/publicData/rainRadar/image/Christchurch/300K/`.
-- **Timezone**: The timezone to use for timestamps. Default is `Pacific/Auckland`.
-- **Hang Time**: The duration (in seconds) to display the latest image before fetching a new one. Default is `5`.
+rainradar:
+  base_url: "https://www.metservice.com/publicData/rainRadar/image/Christchurch/300K/"
+  image_dir: "images"
 
 ## Usage
 Once configured, the RainRadar integration will create sensor entities that represent the latest rain radar images. You can add these sensors to your dashboard to view the images.
