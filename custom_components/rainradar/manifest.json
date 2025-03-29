@@ -5,7 +5,8 @@
   "documentation": "https://github.com/nicoakes/RainRadarrNZ",
   "requirements": [
     "requests",
-    "pytz"
+    "pytz",
+    "aiohttp"
   ],
   "dependencies": [],
   "codeowners": [
