@@ -3,6 +3,7 @@ import asyncio
 from datetime import datetime, timedelta
 import aiohttp
 import pytz
+import logging
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers import discovery
 
@@ -11,6 +12,8 @@ IMAGE_DIR = "www/rainradar_images"
 BASE_URL = "https://www.metservice.com/publicData/rainRadar/image/Christchurch/300K/"
 TIMEZONE = "Pacific/Auckland"
 DOWNLOAD_INTERVAL = 8 * 60  # 8 minutes
+
+_LOGGER = logging.getLogger(__name__)  # Use this logger for logging messages
 
 def get_timezone():
     """Get the timezone object in a synchronous context."""
@@ -41,11 +44,11 @@ async def download_images(hass: HomeAssistant):
                                 with open(filename, 'wb') as file:
                                     while chunk := await response.content.read(1024):
                                         file.write(chunk)
-                                hass.logger.info(f"Downloaded: {filename}")
+                                _LOGGER.info(f"Downloaded: {filename}")  # Use _LOGGER for logging
                             else:
-                                hass.logger.debug(f"Not found: {url}")
+                                _LOGGER.debug(f"Not found: {url}")  # Use _LOGGER for logging
                     except Exception as e:
-                        hass.logger.error(f"Error downloading {url}: {e}")
+                        _LOGGER.error(f"Error downloading {url}: {e}")  # Use _LOGGER for logging
 
             await asyncio.sleep(DOWNLOAD_INTERVAL)
 
