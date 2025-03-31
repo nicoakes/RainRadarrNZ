@@ -19,6 +19,11 @@ def get_timezone():
     """Get the timezone object in a synchronous context."""
     return pytz.timezone(TIMEZONE)
 
+def write_file(filename, content):
+    """Write content to a file in a thread-safe way."""
+    with open(filename, 'wb') as file:
+        file.write(content)
+
 async def download_images(hass: HomeAssistant):
     """Download radar images periodically."""
     # Get the timezone in a thread-safe way
@@ -41,9 +46,8 @@ async def download_images(hass: HomeAssistant):
                     try:
                         async with session.get(url) as response:
                             if response.status == 200:
-                                with open(filename, 'wb') as file:
-                                    while chunk := await response.content.read(1024):
-                                        file.write(chunk)
+                                content = await response.read()
+                                await hass.async_add_executor_job(write_file, filename, content)
                                 _LOGGER.info(f"Downloaded: {filename}")  # Use _LOGGER for logging
                             else:
                                 _LOGGER.debug(f"Not found: {url}")  # Use _LOGGER for logging
