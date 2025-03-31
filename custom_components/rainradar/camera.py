@@ -1,5 +1,4 @@
 import os
-from datetime import datetime
 from homeassistant.components.camera import Camera
 from homeassistant.core import HomeAssistant
 
@@ -19,17 +18,19 @@ class RainRadarCamera(Camera):
         self.hass = hass
         self.image_files = []
         self.current_index = 0
-        self.update_image_list()
 
-    def update_image_list(self):
-        """Update the list of image files."""
+    async def update_image_list(self):
+        """Update the list of image files asynchronously."""
         image_path = self.hass.config.path(IMAGE_DIR)
-        self.image_files = sorted(
-            [os.path.join(image_path, f) for f in os.listdir(image_path) if f.endswith(".gif")]
+        self.image_files = await self.hass.async_add_executor_job(
+            lambda: sorted(
+                [os.path.join(image_path, f) for f in os.listdir(image_path) if f.endswith(".gif")]
+            )
         )
 
-    def camera_image(self):
-        """Return the current image."""
+    async def async_camera_image(self):
+        """Return the current image asynchronously."""
+        await self.update_image_list()
         if not self.image_files:
             return None
 
