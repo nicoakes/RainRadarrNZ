@@ -6,12 +6,13 @@
   "requirements": [
     "requests",
     "pytz",
-    "aiohttp"
+    "aiohttp",
+    "pillow"
   ],
   "dependencies": [],
   "codeowners": [
     "@nic oakes"
   ],
   "iot_class": "cloud_polling",
-  "homeassistant": "2023.1.0"
+  "homeassistant": "2025.2.5"
 }

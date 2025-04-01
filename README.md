@@ -17,6 +17,7 @@ To configure the RainRadar integration, follow these steps:
 rainradar:
   base_url: "https://www.metservice.com/publicData/rainRadar/image/Christchurch/300K/"
   image_dir: "images"
+  crop_box: [240, 200, 1030, 850]  # [left, upper, right, lower]
 ```
 ## Usage
 Once configured, the RainRadar integration will create sensor entities that represent the latest rain radar images. You can add these sensors to your dashboard to view the images.

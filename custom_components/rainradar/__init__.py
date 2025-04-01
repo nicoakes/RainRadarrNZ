@@ -6,6 +6,7 @@ import pytz
 import logging
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers import discovery
+from PIL import Image  # Add this import for image cropping
 
 DOMAIN = "rainradar"
 IMAGE_DIR = "www/rainradar_images"
@@ -24,11 +25,20 @@ def write_file(filename, content):
     with open(filename, 'wb') as file:
         file.write(content)
 
+def crop_image(filename, crop_box):
+    """Crop the image to the specified box."""
+    with Image.open(filename) as img:
+        cropped = img.crop(crop_box)
+        cropped.save(filename)
+
 async def download_images(hass: HomeAssistant):
     """Download radar images periodically."""
     # Get the timezone in a thread-safe way
     tz = await hass.async_add_executor_job(get_timezone)
     os.makedirs(hass.config.path(IMAGE_DIR), exist_ok=True)
+
+    # Get crop box from configuration
+    crop_box = hass.data[DOMAIN].get("crop_box", (240, 200, 1030, 850))
 
     async with aiohttp.ClientSession() as session:
         while True:
@@ -48,7 +58,9 @@ async def download_images(hass: HomeAssistant):
                             if response.status == 200:
                                 content = await response.read()
                                 await hass.async_add_executor_job(write_file, filename, content)
-                                _LOGGER.info(f"Downloaded: {filename}")  # Use _LOGGER for logging
+                                # Crop the image in a non-blocking manner
+                                await hass.async_add_executor_job(crop_image, filename, crop_box)
+                                _LOGGER.info(f"Downloaded and cropped: {filename}")  # Use _LOGGER for logging
                             else:
                                 _LOGGER.debug(f"Not found: {url}")  # Use _LOGGER for logging
                     except Exception as e:
@@ -58,6 +70,10 @@ async def download_images(hass: HomeAssistant):
 
 async def async_setup(hass: HomeAssistant, config: dict):
     """Set up the Rain Radar integration."""
+    # Load crop box configuration
+    crop_box = config.get(DOMAIN, {}).get("crop_box", (240, 200, 1030, 850))
+    hass.data[DOMAIN] = {"crop_box": crop_box}
+
     hass.loop.create_task(download_images(hass))
     await discovery.async_load_platform(hass, "camera", DOMAIN, {}, config)
     return True
