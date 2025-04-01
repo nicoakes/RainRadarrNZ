@@ -1,5 +1,6 @@
 # RainRadar Home Assistant Integration
 
+## Work In Progress.
 ## Overview
 The RainRadar integration for Home Assistant allows users to fetch and display rain radar images from MetService. This integration automatically downloads the latest images and provides them as sensor entities that can be displayed on the Home Assistant dashboard.
 
