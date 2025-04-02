@@ -70,9 +70,10 @@ async def download_images(hass: HomeAssistant):
 
 async def async_setup(hass: HomeAssistant, config: dict):
     """Set up the Rain Radar integration."""
-    # Load crop box configuration
+    # Load crop box and image limit configuration
     crop_box = config.get(DOMAIN, {}).get("crop_box", (240, 200, 1030, 850))
-    hass.data[DOMAIN] = {"crop_box": crop_box}
+    image_limit = config.get(DOMAIN, {}).get("image_limit", 6)  # Default to 6 images
+    hass.data[DOMAIN] = {"crop_box": crop_box, "image_limit": image_limit}
 
     hass.loop.create_task(download_images(hass))
     await discovery.async_load_platform(hass, "camera", DOMAIN, {}, config)

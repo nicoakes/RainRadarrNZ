@@ -19,6 +19,7 @@ rainradar:
   base_url: "https://www.metservice.com/publicData/rainRadar/image/Christchurch/300K/"
   image_dir: "images"
   crop_box: [240, 200, 1030, 850]  # [left, upper, right, lower]
+  image_limit: 10  # Display the last 10 images (default is 6)
 ```
 ## Usage
 Once configured, the RainRadar integration will create sensor entities that represent the latest rain radar images. You can add these sensors to your dashboard to view the images.
