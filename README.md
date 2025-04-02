@@ -16,8 +16,6 @@ To configure the RainRadar integration, follow these steps:
 
 ```yaml
 rainradar:
-  base_url: "https://www.metservice.com/publicData/rainRadar/image/Christchurch/300K/"
-  image_dir: "images"
   crop_box: [240, 200, 1030, 850]  # [left, upper, right, lower]
   image_limit: 10  # Display the last 10 images (default is 6)
   pause_seconds: 5  # Pause on the last image for 5 seconds (default is 3)
@@ -37,6 +35,9 @@ entity: sensor.rain_radar
 - Ensure that the `custom_components` directory is correctly set up in your Home Assistant configuration.
 - Check the Home Assistant logs for any errors related to the RainRadar integration.
 - Verify that the base URL is accessible and returns valid images.
+
+## limitations
+- Only pulls South island Radar images.
 
 ## Contributing
 If you would like to contribute to the RainRadar integration, feel free to submit a pull request or open an issue for any bugs or feature requests.

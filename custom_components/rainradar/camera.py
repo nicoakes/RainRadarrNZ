@@ -1,5 +1,7 @@
 import os
-import asyncio  # Import asyncio for pausing
+import asyncio
+import re
+from datetime import datetime
 from homeassistant.components.camera import Camera
 from homeassistant.core import HomeAssistant
 
@@ -7,6 +9,7 @@ DOMAIN = "rainradar"
 IMAGE_DIR = "www/rainradar_images"
 DEFAULT_IMAGE_LIMIT = 6  # Default number of images to display
 DEFAULT_PAUSE_SECONDS = 3  # Default pause duration on the last image
+IMAGE_TIMESTAMP_FORMAT = "%Y-%m-%dT%H-%M"  # Format used in image filenames
 
 async def async_setup_platform(hass: HomeAssistant, config, async_add_entities, discovery_info=None):
     """Set up the Rain Radar camera."""
@@ -31,11 +34,24 @@ class RainRadarCamera(Camera):
     async def update_image_list(self):
         """Update the list of image files asynchronously."""
         image_path = self.hass.config.path(IMAGE_DIR)
-        self.image_files = await self.hass.async_add_executor_job(
-            lambda: sorted(
-                [os.path.join(image_path, f) for f in os.listdir(image_path) if f.endswith(".gif")]
-            )[-self.image_limit:]  # Limit to the last X images
-        )
+
+        def get_sorted_images():
+            """Retrieve and sort image files by timestamp."""
+            images = []
+            for filename in os.listdir(image_path):
+                if filename.endswith(".gif"):
+                    match = re.search(r"rain_radar_(\d{4}-\d{2}-\d{2}T\d{2}-\d{2})\.gif", filename)
+                    if match:
+                        timestamp_str = match.group(1)
+                        try:
+                            timestamp = datetime.strptime(timestamp_str, IMAGE_TIMESTAMP_FORMAT)
+                            images.append((timestamp, os.path.join(image_path, filename)))
+                        except ValueError:
+                            continue
+            # Sort images by timestamp and return the most recent ones
+            return [file for _, file in sorted(images)[-self.image_limit:]]
+
+        self.image_files = await self.hass.async_add_executor_job(get_sorted_images)
 
     async def async_camera_image(self):
         """Return the current image asynchronously."""
