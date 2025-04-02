@@ -14,5 +14,6 @@
     "@nic oakes"
   ],
   "iot_class": "cloud_polling",
-  "homeassistant": "2025.2.5"
+  "homeassistant": "2025.2.5",
+  "icon": "custom_components/rainradar/icon.png"
 }
