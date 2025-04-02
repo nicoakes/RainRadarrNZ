@@ -6,8 +6,12 @@ import requests
 import os
 from datetime import datetime, timedelta
 import pytz
+import re  # Import regex for parsing timestamps from filenames
 
 _LOGGER = logging.getLogger(__name__)
+
+IMAGE_DIR = "www/rainradar_images"
+IMAGE_TIMESTAMP_FORMAT = "%Y-%m-%dT%H-%M"  # Format used in image filenames
 
 class RainRadarSensor(Entity):
     def __init__(self, coordinator: DataUpdateCoordinator, name: str):
@@ -44,6 +48,30 @@ class RainRadarDataUpdateCoordinator(DataUpdateCoordinator):
 
         return urls
 
+async def delete_old_images(hass):
+    """Delete images older than 2 hours based on the timestamp in the filename."""
+    image_path = hass.config.path(IMAGE_DIR)
+    now = datetime.now()
+
+    def cleanup():
+        for filename in os.listdir(image_path):
+            if filename.endswith(".gif"):
+                # Extract timestamp from the filename
+                match = re.search(r"rain_radar_(\d{4}-\d{2}-\d{2}T\d{2}-\d{2})\.gif", filename)
+                if match:
+                    timestamp_str = match.group(1)
+                    try:
+                        file_time = datetime.strptime(timestamp_str, IMAGE_TIMESTAMP_FORMAT)
+                        # Check if the file is older than 2 hours
+                        if now - file_time > timedelta(hours=2):
+                            os.remove(os.path.join(image_path, filename))
+                            _LOGGER.info(f"Deleted old image: {filename}")
+                    except ValueError:
+                        _LOGGER.warning(f"Invalid timestamp in filename: {filename}")
+
+    # Run the cleanup in a thread-safe manner
+    await hass.async_add_executor_job(cleanup)
+
 async def async_setup_entry(hass, entry):
     base_url = entry.data[CONF_NAME]
     timezone = "Pacific/Auckland"  # You can make this configurable if needed
@@ -53,5 +81,13 @@ async def async_setup_entry(hass, entry):
 
     hass.data.setdefault("rainradar", {})
     hass.data["rainradar"]["coordinator"] = coordinator
+
+    # Schedule periodic cleanup of old images
+    async def periodic_cleanup():
+        while True:
+            await delete_old_images(hass)
+            await asyncio.sleep(3600)  # Run cleanup every hour
+
+    hass.loop.create_task(periodic_cleanup())
 
     hass.helpers.discovery.load_platform("sensor", "rainradar", {}, entry)
