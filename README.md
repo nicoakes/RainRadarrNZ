@@ -20,6 +20,7 @@ rainradar:
   image_dir: "images"
   crop_box: [240, 200, 1030, 850]  # [left, upper, right, lower]
   image_limit: 10  # Display the last 10 images (default is 6)
+  pause_seconds: 5  # Pause on the last image for 5 seconds (default is 3)
 ```
 ## Usage
 Once configured, the RainRadar integration will create sensor entities that represent the latest rain radar images. You can add these sensors to your dashboard to view the images.
