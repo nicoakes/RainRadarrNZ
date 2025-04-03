@@ -5,6 +5,7 @@ from datetime import datetime
 from homeassistant.components.camera import Camera
 from homeassistant.core import HomeAssistant
 from PIL import Image, ImageDraw, ImageFont  # Import Pillow for image manipulation
+import io
 
 DOMAIN = "rainradar"
 IMAGE_DIR = "www/rainradar_images"
@@ -73,6 +74,7 @@ class RainRadarCamera(Camera):
 
         # Add timestamp to the image in a thread-safe, non-blocking manner
         def add_timestamp_to_image(file_path):
+            """Add a timestamp to the bottom-left corner of the image."""
             with Image.open(file_path) as img:
                 draw = ImageDraw.Draw(img)
                 # Extract timestamp from the filename
@@ -84,13 +86,19 @@ class RainRadarCamera(Camera):
 
                 # Define font and text properties
                 font = ImageFont.load_default()  # Use default font
-                text_size = draw.textsize(timestamp_str, font=font)
                 padding = 5
-                text_position = (padding, img.height - text_size[1] - padding)
+
+                # Calculate text size using textbbox
+                text_bbox = draw.textbbox((0, 0), timestamp_str, font=font)
+                text_width = text_bbox[2] - text_bbox[0]
+                text_height = text_bbox[3] - text_bbox[1]
+
+                # Define text position
+                text_position = (padding, img.height - text_height - padding)
 
                 # Draw white rectangle as background for the text
                 draw.rectangle(
-                    [text_position, (text_position[0] + text_size[0] + padding, text_position[1] + text_size[1] + padding)],
+                    [text_position, (text_position[0] + text_width + padding, text_position[1] + text_height + padding)],
                     fill="white"
                 )
                 # Draw the timestamp text in black
