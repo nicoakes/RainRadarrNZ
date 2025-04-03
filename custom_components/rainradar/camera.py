@@ -85,7 +85,9 @@ class RainRadarCamera(Camera):
                     timestamp_str = "Unknown Timestamp"
 
                 # Define font and text properties
-                font = ImageFont.load_default()  # Use default font
+                font_path = os.path.join(os.path.dirname(__file__), "arial.ttf")  # Path to a .ttf font file
+                font_size = 20  # Set font size (twice the default size)
+                font = ImageFont.truetype(font_path, font_size)
                 padding = 5
 
                 # Calculate text size using textbbox
