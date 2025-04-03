@@ -4,6 +4,7 @@ import re
 from datetime import datetime
 from homeassistant.components.camera import Camera
 from homeassistant.core import HomeAssistant
+from PIL import Image, ImageDraw, ImageFont  # Import Pillow for image manipulation
 
 DOMAIN = "rainradar"
 IMAGE_DIR = "www/rainradar_images"
@@ -70,12 +71,37 @@ class RainRadarCamera(Camera):
         # Loop through images
         self.current_index = (self.current_index + 1) % len(self.image_files)
 
-        # Read the image file in a thread-safe, non-blocking manner
-        def read_image_file(file_path):
-            with open(file_path, "rb") as file:
-                return file.read()
+        # Add timestamp to the image in a thread-safe, non-blocking manner
+        def add_timestamp_to_image(file_path):
+            with Image.open(file_path) as img:
+                draw = ImageDraw.Draw(img)
+                # Extract timestamp from the filename
+                match = re.search(r"rain_radar_(\d{4}-\d{2}-\d{2}T\d{2}-\d{2})\.gif", file_path)
+                if match:
+                    timestamp_str = match.group(1)
+                else:
+                    timestamp_str = "Unknown Timestamp"
 
-        return await self.hass.async_add_executor_job(read_image_file, self.image_files[self.current_index])
+                # Define font and text properties
+                font = ImageFont.load_default()  # Use default font
+                text_size = draw.textsize(timestamp_str, font=font)
+                padding = 5
+                text_position = (padding, img.height - text_size[1] - padding)
+
+                # Draw white rectangle as background for the text
+                draw.rectangle(
+                    [text_position, (text_position[0] + text_size[0] + padding, text_position[1] + text_size[1] + padding)],
+                    fill="white"
+                )
+                # Draw the timestamp text in black
+                draw.text(text_position, timestamp_str, fill="black", font=font)
+
+                # Save the modified image to a temporary buffer
+                output = io.BytesIO()
+                img.save(output, format="GIF")
+                return output.getvalue()
+
+        return await self.hass.async_add_executor_job(add_timestamp_to_image, self.image_files[self.current_index])
 
     @property
     def name(self):
