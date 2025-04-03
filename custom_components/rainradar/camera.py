@@ -69,8 +69,13 @@ class RainRadarCamera(Camera):
 
         # Loop through images
         self.current_index = (self.current_index + 1) % len(self.image_files)
-        with open(self.image_files[self.current_index], "rb") as file:
-            return file.read()
+
+        # Read the image file in a thread-safe, non-blocking manner
+        def read_image_file(file_path):
+            with open(file_path, "rb") as file:
+                return file.read()
+
+        return await self.hass.async_add_executor_job(read_image_file, self.image_files[self.current_index])
 
     @property
     def name(self):
