@@ -12,18 +12,20 @@ IMAGE_DIR = "www/rainradar_images"
 DEFAULT_IMAGE_LIMIT = 6  # Default number of images to display
 DEFAULT_PAUSE_SECONDS = 3  # Default pause duration on the last image
 IMAGE_TIMESTAMP_FORMAT = "%Y-%m-%dT%H-%M"  # Format used in image filenames
+DEFAULT_IMAGE_DELAY_MS = 1000  # Default delay between images in milliseconds
 
 async def async_setup_platform(hass: HomeAssistant, config, async_add_entities, discovery_info=None):
     """Set up the Rain Radar camera."""
-    # Get the image limit and pause duration from configuration or use defaults
+    # Get the image limit, pause duration, and image delay from configuration or use defaults
     image_limit = hass.data[DOMAIN].get("image_limit", DEFAULT_IMAGE_LIMIT)
     pause_seconds = hass.data[DOMAIN].get("pause_seconds", DEFAULT_PAUSE_SECONDS)
-    async_add_entities([RainRadarCamera(hass, image_limit, pause_seconds)])
+    image_delay_ms = hass.data[DOMAIN].get("image_delay_ms", DEFAULT_IMAGE_DELAY_MS)
+    async_add_entities([RainRadarCamera(hass, image_limit, pause_seconds, image_delay_ms)])
 
 class RainRadarCamera(Camera):
     """Rain Radar Camera Entity."""
 
-    def __init__(self, hass: HomeAssistant, image_limit: int, pause_seconds: int):
+    def __init__(self, hass: HomeAssistant, image_limit: int, pause_seconds: int, image_delay_ms: int):
         """Initialize the camera."""
         super().__init__()
         self.hass = hass
@@ -31,6 +33,7 @@ class RainRadarCamera(Camera):
         self.current_index = 0
         self.image_limit = image_limit
         self.pause_seconds = pause_seconds
+        self.image_delay_ms = image_delay_ms
         self.pause_on_last_image = False
 
     async def update_image_list(self):
@@ -68,6 +71,9 @@ class RainRadarCamera(Camera):
                 await asyncio.sleep(self.pause_seconds)  # Pause for the configured duration
             else:
                 self.pause_on_last_image = False
+        else:
+            # Delay between images (convert milliseconds to seconds)
+            await asyncio.sleep(self.image_delay_ms / 1000)
 
         # Loop through images
         self.current_index = (self.current_index + 1) % len(self.image_files)
